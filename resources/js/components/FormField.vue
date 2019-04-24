@@ -36,34 +36,13 @@ export default {
     },
 
     mounted() {
-        this.watchedComponents.forEach(component => {
-            let attribute = "value";
-
-            if (component.field.component === "belongs-to-field") {
-                attribute = "selectedResource";
-            }
-
-            component.$watch(
-                attribute,
-                value => {
-                    this.parentValue =
-                        value && attribute == "selectedResource"
-                            ? value.value
-                            : value;
-
-                    this.updateOptions();
-                },
-                { immediate: true }
-            );
-        });
+        if (this.field.recursive)
+            this.watchComponentsRecursively(this.$root);
+        else
+            this.watchParentComponents();
     },
 
     computed: {
-        watchedComponents() {
-            return this.$parent.$children.filter(component => {
-                return this.isWatchingComponent(component);
-            });
-        },
 
         disabled() {
             return this.options.length == 0;
@@ -92,7 +71,9 @@ export default {
                             "&attribute=" +
                             this.field.attribute +
                             "&parent=" +
-                            this.parentValue
+                            this.parentValue +
+                            "&recursive=" +
+                            this.field.recursive
                     )
                     .then(response => {
                         this.loaded = true;
@@ -113,6 +94,41 @@ export default {
                 component.field !== undefined &&
                 component.field.attribute == this.field.parentAttribute
             );
+        },
+        watchParentComponents(){
+            this.$parent.$children.forEach(component => {
+                this.watchIfParent(component)
+            })
+        }
+        ,
+        watchComponentsRecursively(root) {
+            const _this = this;
+            root.$children.forEach(component => {
+                this.watchIfParent(component)
+                this.watchComponentsRecursively(component)
+            })
+        },
+        watchIfParent(component) {
+            let attribute = "value";
+
+            if (this.isWatchingComponent(component)) {
+                if (component.field.component === "belongs-to-field") {
+                    attribute = "selectedResource";
+                }
+                component.$watch(
+                    attribute,
+                    value => {
+                        this.parentValue =
+                            value && attribute == "selectedResource"
+                                ? value.value
+                                : value;
+
+                        this.updateOptions();
+                    },
+                    {immediate: true}
+                );
+            }
+
         }
     }
 };

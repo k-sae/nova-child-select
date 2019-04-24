@@ -11,12 +11,30 @@ class OptionsController extends Controller
     {
         $attribute = $request->query('attribute');
         $parentValue = $request->query('parent');
-
+        $isRecursive = $request->query('recursive');
         $resource = $request->newResource();
-        $fields = $resource->updateFields($request);
-        $field = $fields->findFieldByAttribute($attribute);
-        $options = $field->getOptions($parentValue);
 
-        return $options;
+        if ($isRecursive) {
+            if (!$resource instanceof ChildSelectRecursiveHolder)
+                throw new \Exception("The parent resource must implement: "
+                    . ChildSelectRecursiveHolder::class .
+                    "\ncheck the documentation for more info about the recursive search");
+          $options =  $resource->onParentChanged($attribute, $parentValue);
+        } else {
+            $fields = $resource->updateFields($request);
+            $field = $fields->findFieldByAttribute($attribute);
+            if (!$options)
+                throw new \Exception("Child wasnt not found try to use the ecursive search instead");
+            $options = $field->getOptions($parentValue);
+        }
+
+        foreach ($options as $key => $option) {
+            $result[] = [
+                'label' => $option,
+                'value' => $key,
+            ];
+        }
+
+        return $result;
     }
 }

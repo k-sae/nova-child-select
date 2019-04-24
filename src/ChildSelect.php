@@ -19,22 +19,17 @@ class ChildSelect extends Field
 
     public function getOptions($parameters = [])
     {
-        $options = call_user_func($this->options, $parameters);
-
-        $result = [];
-        foreach ($options as $key => $option) {
-            $result[] = [
-                'label' => $option,
-                'value' => $key,
-            ];
-        }
-
-        return $result;
+        return call_user_func($this->options, $parameters);
     }
 
     public function parent($attribute)
     {
         $this->withMeta(['parentAttribute' => $attribute]);
         return $this;
+    }
+
+    public function recursive()
+    {
+        return $this->withMeta(['recursive' => true]);
     }
 }
