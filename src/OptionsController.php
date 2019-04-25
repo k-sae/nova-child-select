@@ -27,7 +27,9 @@ class OptionsController extends Controller
                 throw new \Exception("Child wasnt not found try to use the ecursive search instead");
             $options = $field->getOptions($parentValue);
         }
-
+        
+        $result = [];
+        
         foreach ($options as $key => $option) {
             $result[] = [
                 'label' => $option,
