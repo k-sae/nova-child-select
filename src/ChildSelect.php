@@ -10,6 +10,13 @@ class ChildSelect extends Field
 
     protected $options;
 
+    public function __construct($name, $attribute = null, $resolveCallback = null)
+    {
+        parent::__construct($name, $attribute, $resolveCallback);
+
+        $this->withMeta(['searchAlgorithm' => 'parent_shallow']);
+    }
+
     public function options($options)
     {
         $this->options = $options;
@@ -28,8 +35,19 @@ class ChildSelect extends Field
         return $this;
     }
 
-    public function recursive()
+    public function rootRecursiveSearch()
     {
-        return $this->withMeta(['recursive' => true]);
+        return $this->withMeta(['searchAlgorithm' => 'root_recursive']);
     }
+
+    public function parentRecursiveSearch()
+    {
+        return $this->withMeta(['searchAlgorithm' => 'parent_recursive']);
+    }
+    
+    public function childrenRecursiveSearch()
+    {
+        return $this->withMeta(['searchAlgorithm' => 'children_recursive']);
+    }
+
 }
