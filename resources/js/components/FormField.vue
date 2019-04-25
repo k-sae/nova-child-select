@@ -112,14 +112,17 @@ export default {
             let attribute = "value";
 
             if (this.isWatchingComponent(component)) {
-                if (component.field.component === "belongs-to-field") {
+                let isBelongsRelation = component.field.component === "belongs-to-field"
+                    || component.field.component === "belongs-to-many-field"
+
+                if (isBelongsRelation)
                     attribute = "selectedResource";
-                }
+
                 component.$watch(
                     attribute,
                     value => {
                         this.parentValue =
-                            value && attribute == "selectedResource"
+                            value && isBelongsRelation
                                 ? value.value
                                 : value;
 
