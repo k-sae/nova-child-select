@@ -36,9 +36,15 @@ export default {
     },
 
     mounted() {
-        if (this.field.recursive)
+        if (this.field.searchAlgorithm == 'root_recursive')
             this.watchComponentsRecursively(this.$root);
+        else if (this.field.searchAlgorithm == 'parent_recursive')
+            this.watchComponentsRecursively(this.$parent);
+        else if (this.field.searchAlgorithm == 'children_recursive')
+            this.watchComponentsRecursively(this);
         else
+            // TODO add a shallow search support similar to the recursive
+            // ex: watchShallowComponents($parent/$this..etc)
             this.watchParentComponents();
     },
 
@@ -72,8 +78,8 @@ export default {
                             this.field.attribute +
                             "&parent=" +
                             this.parentValue +
-                            "&recursive=" +
-                            this.field.recursive
+                            "&searchAlgorithm=" +
+                            this.field.searchAlgorithm
                     )
                     .then(response => {
                         this.loaded = true;
