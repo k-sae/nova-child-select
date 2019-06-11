@@ -28,8 +28,6 @@ class OptionsController extends Controller
             $fields = $resource->updateFields($request);
             $field = $fields->findFieldByAttribute($attribute);
 
-            if (!$options)
-                throw new \Exception("Child wasn't not found try to use the recursive search instead");
 
             $options = $field->getOptions($parentValue);
         }
